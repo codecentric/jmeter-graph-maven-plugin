@@ -10,11 +10,13 @@
     </parent>
 
     <groupId>de.codecentric.jmeter</groupId>
-    <artifactId>jmeter-plugins-maven-plugin</artifactId>
+    <artifactId>jmeter-graph-maven-plugin</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
-    <name>JMeter Plugins Maven Plugin</name>
-    <description>A plugin to include include the functionality of JMeterPluginsCMD Command Line Tool in Maven builds.
+    <name>JMeter Graphs Maven Plugin</name>
+    <description>
+        A plugin to include include the functionality of JMeterPluginsCMD Command Line Tool
+        to draw nice graphs from jmeter result files in Maven builds.
     </description>
     <url>http://mjlex.blogspot.com</url>
 
@@ -42,21 +44,21 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/mlex/jmeter-plugins-maven-plugin/issues</url>
+        <url>https://github.com/mlex/jmeter-graph-maven-plugin/issues</url>
     </issueManagement>
 
     <ciManagement>
         <system>Travis-CI</system>
-        <url>http://travis-ci.com/mlex/jmeter-plugins-maven-plugin</url>
+        <url>http://travis-ci.com/mlex/jmeter-graph-maven-plugin</url>
     </ciManagement>
 
     <mailingLists>
     </mailingLists>
 
     <scm>
-        <connection>scm:git:git@github.com:mlex/jmeter-plugins-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:mlex/jmeter-plugins-maven-plugin.git</developerConnection>
-        <url>https://github.com/mlex/jmeter-plugins-maven-plugin</url>
+        <connection>scm:git:git@github.com:mlex/jmeter-graph-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:mlex/jmeter-graph-maven-plugin.git</developerConnection>
+        <url>https://github.com/mlex/jmeter-graph-maven-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -133,25 +135,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
                     <version>3.2</version>
-                    <configuration>
-                        <!-- TODO: workaround for  http://jira.codehaus.org/browse/MNG-5346 -->
-                        <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>mojo-descriptor</id>
-                            <goals>
-                                <goal>descriptor</goal>
-                            </goals>
-                        </execution>
-                        <!-- if you want to generate help goal -->
-                        <execution>
-                            <id>help-goal</id>
-                            <goals>
-                                <goal>helpmojo</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

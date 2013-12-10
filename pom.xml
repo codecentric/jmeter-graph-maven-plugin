@@ -98,8 +98,13 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        <!-- JMeter dependencies -->
+        <dependency>
+            <groupId>org.twdata.maven</groupId>
+            <artifactId>mojo-executor</artifactId>
+            <version>2.1.0</version>
+        </dependency>
 
+        <!-- JMeter dependencies -->
         <dependency>
             <groupId>org.apache.jmeter</groupId>
             <artifactId>ApacheJMeter</artifactId>
@@ -110,78 +115,6 @@
             <artifactId>ApacheJMeter_core</artifactId>
             <version>${jmeter.version}</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_components</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_functions</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_http</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_java</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_report</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_tcp</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_ftp</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_jdbc</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_jms</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_ldap</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_mail</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_junit</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_monitors</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_native</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.apache.jmeter</groupId>
             <artifactId>ApacheJMeter_config</artifactId>

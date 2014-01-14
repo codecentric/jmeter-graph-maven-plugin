@@ -10,7 +10,7 @@
 
     <groupId>de.codecentric</groupId>
     <artifactId>jmeter-graph-maven-plugin</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>JMeter Graphs Maven Plugin</name>
     <description>
@@ -59,7 +59,7 @@
         <connection>scm:git:git@github.com:codecentric/jmeter-graph-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:codecentric/jmeter-graph-maven-plugin.git</developerConnection>
         <url>https://github.com/codecentric/jmeter-graph-maven-plugin</url>
-        <tag>RELEASE_0.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>

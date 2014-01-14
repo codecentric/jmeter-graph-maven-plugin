@@ -29,6 +29,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
     public static final String JMETER_PLUGINS_ARTIFACT_NAME = "jmeter-plugins";
     public static final String JMETER_ARTIFACT_NAME = "ApacheJMeter";
     public static final String JMETER_CORE_ARTIFACT_NAME = "ApacheJMeter_core";
+
     @Parameter
     File inputFile;
 

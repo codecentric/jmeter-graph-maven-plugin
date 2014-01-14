@@ -71,7 +71,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
         for (Artifact artifact : plugin.getArtifacts()) {
             try {
                 if (JMETER_CONFIG_ARTIFACT_NAME.equals(artifact.getArtifactId())) {
-                    getLog().info("Copy configuration files to " + binDir.getAbsolutePath());
+                    getLog().debug("Copy configuration files to " + binDir.getAbsolutePath());
                     JarFile jarFile = new JarFile(artifact.getFile());
                     Enumeration<JarEntry> entries = jarFile.entries();
                     while (entries.hasMoreElements()) {
@@ -80,7 +80,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
                                 entry.getName().startsWith("bin") &&
                                 entry.getName().endsWith(".properties")) {
                             File configFileDestination = new File(workingDirectory + File.separator + entry.getName());
-                            getLog().info("Write configuration " + configFileDestination.getAbsoluteFile());
+                            getLog().debug("Write configuration " + configFileDestination.getAbsoluteFile());
                             FileUtils.copyInputStreamToFile(
                                     jarFile.getInputStream(entry),
                                     configFileDestination);
@@ -88,11 +88,11 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     }
                     jarFile.close();
                 } else if (isJMeterDependency(artifact)) {
-                    getLog().info("Copy artifact " + artifact.toString() + " to " + libDir.getAbsolutePath());
+                    getLog().debug("Copy artifact " + artifact.toString() + " to " + libDir.getAbsolutePath());
                     File artifactDestination = new File(libDir.getAbsolutePath() + File.separator + artifact.getArtifactId() + ".jar");
                     FileUtils.copyFile(artifact.getFile(), artifactDestination);
                 } else if (isJMeterPluginsDependency(artifact)) {
-                    getLog().info("Copy artifact " + artifact.toString() + " to " + libExtDir.getAbsolutePath());
+                    getLog().debug("Copy artifact " + artifact.toString() + " to " + libExtDir.getAbsolutePath());
                     File artifactDestination = new File(libExtDir.getAbsolutePath() + File.separator + artifact.getArtifactId() + ".jar");
                     FileUtils.copyFile(artifact.getFile(), artifactDestination);
                 }
@@ -102,7 +102,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
         }
 
         for (Graph graph : graphs) {
-            getLog().info("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
+            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
             try {
                 executeMojo(
                         plugin(
@@ -161,7 +161,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
     }
 
     private void createDirectoryIfNotExists(File directory) throws MojoExecutionException {
-        getLog().info("Set up jmeter in " + directory);
+        getLog().debug("Set up jmeter in " + directory);
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
                 throw new MojoExecutionException("Could not make working directory: '"

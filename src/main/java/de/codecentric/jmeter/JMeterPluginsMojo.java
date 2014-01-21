@@ -1,6 +1,8 @@
 package de.codecentric.jmeter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -12,9 +14,13 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -25,6 +31,7 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 @Mojo(name = "create-graph")
 public class JMeterPluginsMojo extends AbstractMojo {
 
+	public static final String FILENAME_REPLACE_PATTERN = "%FILENAME%";
     public static final String JMETER_CONFIG_ARTIFACT_NAME = "ApacheJMeter_config";
     public static final String JMETER_PLUGINS_ARTIFACT_NAME = "jmeter-plugins";
     public static final String JMETER_ARTIFACT_NAME = "ApacheJMeter";
@@ -32,6 +39,9 @@ public class JMeterPluginsMojo extends AbstractMojo {
 
     @Parameter
     File inputFile;
+
+    @Parameter
+    String inputFilePattern;
 
     @Parameter
     List<Graph> graphs;
@@ -101,47 +111,74 @@ public class JMeterPluginsMojo extends AbstractMojo {
             }
         }
 
-        for (Graph graph : graphs) {
-            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
-            try {
-                executeMojo(
-                        plugin(
-                                groupId("org.codehaus.mojo"),
-                                artifactId("exec-maven-plugin"),
-                                version("1.2.1")),
-                        goal("exec"),
-                        configuration(
-                                element(name("executable"), "java"),
-                                element(name("workingDirectory"), binDir.getAbsolutePath()),
-                                element(name("arguments"),
-                                        element(name("argument"), "-Dlog_file="),
-                                        element(name("argument"), "-classpath"),
-                                        element(name("argument"),
-                                                libDir.getAbsolutePath() + File.separator + "*" +
-                                                File.pathSeparator +
-                                                libExtDir.getAbsolutePath() + File.separator + "*"),
-                                        element(name("argument"), "kg.apc.cmd.UniversalRunner"),
-                                        element(name("argument"), "--tool"),
-                                        element(name("argument"), "Reporter"),
-                                        element(name("argument"), "--input-jtl"),
-                                        element(name("argument"), inputFile.getAbsolutePath()),
-                                        element(name("argument"), "--plugin-type"),
-                                        element(name("argument"), graph.pluginType),
-                                        element(name("argument"), "--width"),
-                                        element(name("argument"), String.valueOf(graph.width)),
-                                        element(name("argument"), "--height"),
-                                        element(name("argument"), String.valueOf(graph.height)),
-                                        element(name("argument"), "--generate-png"),
-                                        element(name("argument"), graph.outputFile.getAbsolutePath()))),
-                        executionEnvironment(
-                                mavenProject,
-                                mavenSession,
-                                pluginManager));
-            } catch (Throwable throwable) {
-                throw new RuntimeException(throwable);
-            }
+        for (File source : getInputFiles()) {
+
+        	getLog().info("Processing " + source);
+
+	        for (Graph graph : graphs) {
+	            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
+	            try {
+	                executeMojo(
+	                        plugin(
+	                                groupId("org.codehaus.mojo"),
+	                                artifactId("exec-maven-plugin"),
+	                                version("1.2.1")),
+	                        goal("exec"),
+	                        configuration(
+	                                element(name("executable"), "java"),
+	                                element(name("workingDirectory"), binDir.getAbsolutePath()),
+	                                element(name("arguments"),
+	                                        element(name("argument"), "-Dlog_file="),
+	                                        element(name("argument"), "-classpath"),
+	                                        element(name("argument"),
+	                                                libDir.getAbsolutePath() + File.separator + "*" +
+	                                                File.pathSeparator +
+	                                                libExtDir.getAbsolutePath() + File.separator + "*"),
+	                                        element(name("argument"), "kg.apc.cmd.UniversalRunner"),
+	                                        element(name("argument"), "--tool"),
+	                                        element(name("argument"), "Reporter"),
+	                                        element(name("argument"), "--input-jtl"),
+	                                        element(name("argument"), source.getAbsolutePath()),
+	                                        element(name("argument"), "--plugin-type"),
+	                                        element(name("argument"), graph.pluginType),
+	                                        element(name("argument"), "--width"),
+	                                        element(name("argument"), String.valueOf(graph.width)),
+	                                        element(name("argument"), "--height"),
+	                                        element(name("argument"), String.valueOf(graph.height)),
+	                                        element(name("argument"), "--generate-png"),
+		                                    element(name("argument"), graph.getOutputFile(source).getAbsolutePath()))),
+	                        executionEnvironment(
+	                                mavenProject,
+	                                mavenSession,
+	                                pluginManager));
+	            } catch (Throwable throwable) {
+	                throw new RuntimeException(throwable);
+	            }
+	        }
         }
     }
+
+	private Collection<File> getInputFiles() {
+		final Collection<File> dataInputFiles = new ArrayList<File>();
+
+        if (inputFile != null) {
+        	dataInputFiles.add(inputFile);
+        }
+
+        if (StringUtils.isNotEmpty(inputFilePattern)) {
+            final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            try {
+				for (Resource resource : resolver.getResources("file:" + inputFilePattern)) {
+					getLog().info("Adding " + resource.getFile());
+					dataInputFiles.add(resource.getFile());
+				}
+			} catch (IOException e) {
+				getLog().warn("Unable to add input files: " + e.getMessage());
+			}
+        }
+
+		return dataInputFiles;
+	}
 
     private boolean isJMeterPluginsDependency(Artifact artifact) {
         return isDependencyOf(artifact, JMETER_PLUGINS_ARTIFACT_NAME);
@@ -175,6 +212,15 @@ public class JMeterPluginsMojo extends AbstractMojo {
         Integer width;
         Integer height;
         File outputFile;
+        String outputFilePattern;
+
+        File getOutputFile(File inputFile) {
+        	if (outputFile != null) {
+        		return outputFile;
+        	}
+
+        	return new File(outputFilePattern.replace(FILENAME_REPLACE_PATTERN, FilenameUtils.removeExtension(inputFile.getName())));
+        }
 
         @Override
         public String toString() {
@@ -183,6 +229,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     ", width=" + width +
                     ", height=" + height +
                     ", outputFile=" + outputFile +
+                    ", outputFilePattern=" + outputFilePattern +
                     '}';
         }
     }

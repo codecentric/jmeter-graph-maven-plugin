@@ -75,7 +75,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jmeter.version>2.10</jmeter.version>
-        <jmeter.plugins.version>1.0.0</jmeter.plugins.version>
+        <jmeter.plugins.version>1.1.4</jmeter.plugins.version>
     </properties>
 
     <dependencies>
@@ -102,6 +102,11 @@
             <artifactId>mojo-executor</artifactId>
             <version>2.1.0</version>
         </dependency>
+        <dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-core</artifactId>
+		    <version>4.0.3.RELEASE</version>
+		</dependency>
 
         <!-- JMeter dependencies -->
         <dependency>
@@ -121,7 +126,27 @@
         </dependency>
         <dependency>
             <groupId>kg.apc</groupId>
-            <artifactId>jmeter-plugins</artifactId>
+            <artifactId>jmeter-plugins-standard</artifactId>
+            <version>${jmeter.plugins.version}</version>
+            <exclusions>
+                <!-- Those are not available in mvncentral -->
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>kg.apc</groupId>
+                    <artifactId>perfmon</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-extras</artifactId>
             <version>${jmeter.plugins.version}</version>
             <exclusions>
                 <!-- Those are not available in mvncentral -->

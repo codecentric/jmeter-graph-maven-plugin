@@ -5,7 +5,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -118,6 +117,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
 
 	        for (Graph graph : graphs) {
 	            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
+	            String outputResultFile = graph.getOutputFile(source).getAbsolutePath();
 	            try {
 	                executeMojo(
 	                        plugin(
@@ -129,31 +129,31 @@ public class JMeterPluginsMojo extends AbstractMojo {
 	                                element(name("executable"), "java"),
 	                                element(name("workingDirectory"), binDir.getAbsolutePath()),
 	                                element(name("arguments"),
-                                		array(
-	                                        element(name("argument"), "-Dlog_file="),
-	                                        element(name("argument"), "-classpath"),
-	                                        element(name("argument"),
-	                                                libDir.getAbsolutePath() + File.separator + "*" +
-	                                                File.pathSeparator +
-	                                                libExtDir.getAbsolutePath() + File.separator + "*"),
-	                                        element(name("argument"), "kg.apc.cmd.UniversalRunner"),
-	                                        element(name("argument"), "--tool"),
-	                                        element(name("argument"), "Reporter"),
-	                                        element(name("argument"), "--input-jtl"),
-	                                        element(name("argument"), inputFile.getAbsolutePath()),
-	                                        element(name("argument"), "--plugin-type"),
-	                                        element(name("argument"), graph.pluginType),
-	                                        // branch in case we have csv file
-	                                        (graph.outputFile.getAbsolutePath().endsWith(".csv"))
-	                                        	?element(name("argument"), "--generate-csv"):
-                                        	array(
-	                                        element(name("argument"), "--width"),
-	                                        element(name("argument"), String.valueOf(graph.width)),
-	                                        element(name("argument"), "--height"),
-	                                        element(name("argument"), String.valueOf(graph.height)),
-	                                        element(name("argument"), "--generate-png")	
-                                        	),
-		                                    element(name("argument"), graph.outputFile.getAbsolutePath())))),
+	                                        array(
+	                                                argument("-Dlog_file="),
+	                                                argument("-classpath",
+	                                                        libDir.getAbsolutePath() + File.separator + "*" +
+                                                            File.pathSeparator +
+                                                            libExtDir.getAbsolutePath() + File.separator + "*"),
+	                                                argument("kg.apc.cmd.UniversalRunner"),
+	                                                argument("--tool","Reporter"),
+	                                                argument("--input-jtl", source.getAbsolutePath()),
+	                                                argument("--plugin-type", graph.pluginType),
+        	                                        // branch in case we have csv file
+        	                                        (outputResultFile.endsWith(".csv")) ? argument("--generate-csv") : 
+                                                    array(
+            	                                        argument("--width", String.valueOf(graph.width), graph.width != null),
+            	                                        argument("--height", String.valueOf(graph.height), graph.height != null),
+            	                                        argument("--graph-per-row", graph.graphPerRow, !StringUtils.isBlank(graph.graphPerRow)),
+                                                        argument("--granulation", String.valueOf(graph.granulation), graph.granulation != null),
+                                                        argument("--prevent-outliers", graph.preventOutliers, !StringUtils.isBlank(graph.preventOutliers)),
+            	                                        argument("--generate-png")
+            	                                        
+                                                    ),
+                                                    argument(outputResultFile)
+                                            )
+                                    )
+                            ),
 	                        executionEnvironment(
 	                                mavenProject,
 	                                mavenSession,
@@ -220,7 +220,10 @@ public class JMeterPluginsMojo extends AbstractMojo {
         Integer height;
         File outputFile;
         String outputFilePattern;
-
+        String graphPerRow;
+        Integer granulation;
+        String preventOutliers;
+        
         File getOutputFile(File inputFile) {
         	if (outputFile != null) {
         		return outputFile;
@@ -237,6 +240,9 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     ", height=" + height +
                     ", outputFile=" + outputFile +
                     ", outputFilePattern=" + outputFilePattern +
+                    ", graphPerRow=" + graphPerRow +
+                    ", granulation=" + granulation + 
+                    ", preventOutliers= " + preventOutliers +
                     '}';
         }
     }
@@ -261,5 +267,27 @@ public class JMeterPluginsMojo extends AbstractMojo {
 	 			}
 	 	}
         return list.toArray(new Element[list.size()]);
+    }
+    
+    public static Element[] argument(String argName){
+        return argument(argName, "");
+    }
+    
+    public static Element[] argument(String argName, String argValue){
+        return argument(argName, argValue, true);
+    }
+    
+    public static Element[] argument(String argName, String argValue, boolean condition){
+        if(!condition) {
+            return new Element[0];
+        }
+        
+        Element first = element(name("argument"), argName);
+        
+        if(StringUtils.isBlank(argValue)){
+            return array(first);
+        }
+        
+        return array(first, element(name("argument"), argValue));
     }
 }

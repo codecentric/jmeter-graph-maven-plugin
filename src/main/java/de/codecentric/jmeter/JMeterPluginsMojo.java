@@ -60,9 +60,16 @@ public class JMeterPluginsMojo extends AbstractMojo {
 
     @Component
     PluginDescriptor plugin;
+    
+    @Parameter(defaultValue = "false")
+    boolean skip;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if(skip){
+            return;
+        }
+        
         if (graphs == null) {
             getLog().error("No graphs defined.");
         }

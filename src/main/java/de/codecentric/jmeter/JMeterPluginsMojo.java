@@ -127,6 +127,10 @@ public class JMeterPluginsMojo extends AbstractMojo {
                                         element(name("argument"), inputFile.getAbsolutePath()),
                                         element(name("argument"), "--plugin-type"),
                                         element(name("argument"), graph.pluginType),
+                                        element(name("argument"), "--include-labels"),
+                                        element(name("argument"), graph.includeLabels),
+                                        element(name("argument"), "--exclude-labels"),
+                                        element(name("argument"), graph.excludeLabels),
                                         element(name("argument"), "--width"),
                                         element(name("argument"), String.valueOf(graph.width)),
                                         element(name("argument"), "--height"),
@@ -174,6 +178,8 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String pluginType;
         Integer width;
         Integer height;
+        String includeLabels;
+        String excludeLabels;
         File outputFile;
 
         @Override
@@ -182,6 +188,8 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     "pluginType='" + pluginType + '\'' +
                     ", width=" + width +
                     ", height=" + height +
+                    ", includeLabels=" + includeLabels +
+                    ", excludeLabels=" + excludeLabels +
                     ", outputFile=" + outputFile +
                     '}';
         }

@@ -15,6 +15,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -102,9 +103,41 @@ public class JMeterPluginsMojo extends AbstractMojo {
         }
 
         for (Graph graph : graphs) {
-            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
-            try {
-                executeMojo(
+        	getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
+
+        	ArrayList<Element> argList = new ArrayList<Element>();
+        	argList.add(element(name("argument"), "-Dlog_file="));
+        	argList.add(element(name("argument"), "-classpath"));
+        	argList.add(element(name("argument"),
+        			libDir.getAbsolutePath() + File.separator + "*" +
+        					File.pathSeparator +
+        					libExtDir.getAbsolutePath() + File.separator + "*"));
+        	argList.add(element(name("argument"), "kg.apc.cmd.UniversalRunner"));
+        	argList.add(element(name("argument"), "--tool"));
+        	argList.add(element(name("argument"), "Reporter"));
+        	argList.add(element(name("argument"), "--input-jtl"));
+        	argList.add(element(name("argument"), inputFile.getAbsolutePath()));
+        	argList.add(element(name("argument"), "--plugin-type"));
+        	argList.add(element(name("argument"), graph.pluginType));
+
+        	if (graph.includeLabels != null) {
+        		argList.add(element(name("argument"), "--include-labels"));
+        		argList.add(element(name("argument"), graph.includeLabels));
+        	}
+        	if (graph.excludeLabels != null) {
+        		argList.add(element(name("argument"), "--exclude-labels"));
+        		argList.add(element(name("argument"), graph.excludeLabels));
+        	}
+
+        	argList.add(element(name("argument"), "--width"));
+        	argList.add(element(name("argument"), String.valueOf(graph.width)));
+        	argList.add(element(name("argument"), "--height"));
+        	argList.add(element(name("argument"), String.valueOf(graph.height)));
+        	argList.add(element(name("argument"), "--generate-png"));
+        	argList.add(element(name("argument"), graph.outputFile.getAbsolutePath()));
+        	
+        	try {
+        		executeMojo(
                         plugin(
                                 groupId("org.codehaus.mojo"),
                                 artifactId("exec-maven-plugin"),
@@ -114,29 +147,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
                                 element(name("executable"), "java"),
                                 element(name("workingDirectory"), binDir.getAbsolutePath()),
                                 element(name("arguments"),
-                                        element(name("argument"), "-Dlog_file="),
-                                        element(name("argument"), "-classpath"),
-                                        element(name("argument"),
-                                                libDir.getAbsolutePath() + File.separator + "*" +
-                                                File.pathSeparator +
-                                                libExtDir.getAbsolutePath() + File.separator + "*"),
-                                        element(name("argument"), "kg.apc.cmd.UniversalRunner"),
-                                        element(name("argument"), "--tool"),
-                                        element(name("argument"), "Reporter"),
-                                        element(name("argument"), "--input-jtl"),
-                                        element(name("argument"), inputFile.getAbsolutePath()),
-                                        element(name("argument"), "--plugin-type"),
-                                        element(name("argument"), graph.pluginType),
-                                        element(name("argument"), "--include-labels"),
-                                        element(name("argument"), graph.includeLabels),
-                                        element(name("argument"), "--exclude-labels"),
-                                        element(name("argument"), graph.excludeLabels),
-                                        element(name("argument"), "--width"),
-                                        element(name("argument"), String.valueOf(graph.width)),
-                                        element(name("argument"), "--height"),
-                                        element(name("argument"), String.valueOf(graph.height)),
-                                        element(name("argument"), "--generate-png"),
-                                        element(name("argument"), graph.outputFile.getAbsolutePath()))),
+                                		argList.toArray(new Element[0]))),
                         executionEnvironment(
                                 mavenProject,
                                 mavenSession,

@@ -154,6 +154,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
             	                                        argument("--graph-per-row", graph.graphPerRow, !StringUtils.isBlank(graph.graphPerRow)),
                                                         argument("--granulation", String.valueOf(graph.granulation), graph.granulation != null),
                                                         argument("--prevent-outliers", graph.preventOutliers, !StringUtils.isBlank(graph.preventOutliers)),
+                                                        argument("--line-weight", graph.lineWeight, !StringUtils.isBlank(graph.lineWeight)),
             	                                        argument("--generate-png")
             	                                        
                                                     ),
@@ -230,6 +231,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String graphPerRow;
         Integer granulation;
         String preventOutliers;
+        String lineWeight;
         
         File getOutputFile(File inputFile) {
         	if (outputFile != null) {

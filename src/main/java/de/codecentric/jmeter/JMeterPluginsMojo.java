@@ -120,6 +120,10 @@ public class JMeterPluginsMojo extends AbstractMojo {
         	argList.add(element(name("argument"), "--plugin-type"));
         	argList.add(element(name("argument"), graph.pluginType));
 
+        	if (graph.relativeTimes != null) {
+        		argList.add(element(name("argument"), "--relative-times"));
+        		argList.add(element(name("argument"), "no".equalsIgnoreCase(graph.relativeTimes)? "no" : "yes"));
+        	}
         	if (graph.includeLabels != null) {
         		argList.add(element(name("argument"), "--include-labels"));
         		argList.add(element(name("argument"), graph.includeLabels));
@@ -189,6 +193,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String pluginType;
         Integer width;
         Integer height;
+        String relativeTimes;
         String includeLabels;
         String excludeLabels;
         File outputFile;
@@ -199,6 +204,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     "pluginType='" + pluginType + '\'' +
                     ", width=" + width +
                     ", height=" + height +
+                    ", relativeTimes=" + relativeTimes +
                     ", includeLabels=" + includeLabels +
                     ", excludeLabels=" + excludeLabels +
                     ", outputFile=" + outputFile +

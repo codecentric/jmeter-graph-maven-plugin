@@ -114,7 +114,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
                                 element(name("executable"), "java"),
                                 element(name("workingDirectory"), binDir.getAbsolutePath()),
                                 element(name("arguments"),
-                                        element(name("argument"), "-Dlog_file="),
+                                        //element(name("argument"), "-Dlog_file="),
                                         element(name("argument"), "-classpath"),
                                         element(name("argument"),
                                                 libDir.getAbsolutePath() + File.separator + "*" +

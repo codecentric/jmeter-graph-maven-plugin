@@ -198,6 +198,11 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String excludeLabels;
         File outputFile;
 
+        Graph() {
+            width = 800;
+            height = 600;
+        }
+
         @Override
         public String toString() {
             return "Graph{" +

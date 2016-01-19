@@ -126,7 +126,6 @@ public class JMeterPluginsMojo extends AbstractMojo {
 	            String outputResultFile = graph.getOutputFile(source).getAbsolutePath();
 	            
 	            ArrayList<Element> argList = new ArrayList<Element>();
-				argList.add(element(name("argument"), "-Dlog_file="));
 				argList.add(element(name("argument"), "-classpath"));
 				argList.add(element(name("argument"),
 						libDir.getAbsolutePath() + File.separator + "*" +

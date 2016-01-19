@@ -119,56 +119,88 @@ public class JMeterPluginsMojo extends AbstractMojo {
         }
 
         for (File source : getInputFiles()) {
-
         	getLog().info("Processing " + source);
 
 	        for (Graph graph : graphs) {
 	            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
 	            String outputResultFile = graph.getOutputFile(source).getAbsolutePath();
-	            try {
-	                executeMojo(
-	                        plugin(
-	                                groupId("org.codehaus.mojo"),
-	                                artifactId("exec-maven-plugin"),
-	                                version("1.2.1")),
-	                        goal("exec"),
-	                        configuration(
-	                                element(name("executable"), "java"),
-	                                element(name("workingDirectory"), binDir.getAbsolutePath()),
-	                                element(name("arguments"),
-	                                        array(
-	                                                argument("-Dlog_file="),
-	                                                argument("-classpath",
-	                                                        libDir.getAbsolutePath() + File.separator + "*" +
-                                                            File.pathSeparator +
-                                                            libExtDir.getAbsolutePath() + File.separator + "*"),
-	                                                argument("kg.apc.cmd.UniversalRunner"),
-	                                                argument("--tool","Reporter"),
-	                                                argument("--input-jtl", source.getAbsolutePath()),
-	                                                argument("--plugin-type", graph.pluginType),
-        	                                        // branch in case we have csv file
-        	                                        (outputResultFile.endsWith(".csv")) ? argument("--generate-csv") : 
-                                                    array(
-            	                                        argument("--width", String.valueOf(graph.width), graph.width != null),
-            	                                        argument("--height", String.valueOf(graph.height), graph.height != null),
-            	                                        argument("--graph-per-row", graph.graphPerRow, !StringUtils.isBlank(graph.graphPerRow)),
-                                                        argument("--granulation", String.valueOf(graph.granulation), graph.granulation != null),
-                                                        argument("--prevent-outliers", graph.preventOutliers, !StringUtils.isBlank(graph.preventOutliers)),
-                                                        argument("--line-weight", graph.lineWeight, !StringUtils.isBlank(graph.lineWeight)),
-            	                                        argument("--generate-png")
-            	                                        
-                                                    ),
-                                                    argument(outputResultFile)
-                                            )
-                                    )
-                            ),
-	                        executionEnvironment(
-	                                mavenProject,
-	                                mavenSession,
-	                                pluginManager));
-	            } catch (Throwable throwable) {
-	                throw new RuntimeException(throwable);
-	            }
+	            
+	            ArrayList<Element> argList = new ArrayList<Element>();
+				argList.add(element(name("argument"), "-Dlog_file="));
+				argList.add(element(name("argument"), "-classpath"));
+				argList.add(element(name("argument"),
+						libDir.getAbsolutePath() + File.separator + "*" +
+								File.pathSeparator +
+								libExtDir.getAbsolutePath() + File.separator + "*"));
+				argList.add(element(name("argument"), "kg.apc.cmd.UniversalRunner"));
+				argList.add(element(name("argument"), "--tool"));
+				argList.add(element(name("argument"), "Reporter"));
+				argList.add(element(name("argument"), "--input-jtl"));
+				argList.add(element(name("argument"), source.getAbsolutePath()));
+				argList.add(element(name("argument"), "--plugin-type"));
+				argList.add(element(name("argument"), graph.pluginType));
+				
+				if (graph.relativeTimes != null) {
+					argList.add(element(name("argument"), "--relative-times"));
+					argList.add(element(name("argument"), "no".equalsIgnoreCase(graph.relativeTimes)? "no" : "yes"));
+				}
+				if (graph.includeLabels != null) {
+					argList.add(element(name("argument"), "--include-labels"));
+					argList.add(element(name("argument"), graph.includeLabels));
+				}
+				if (graph.excludeLabels != null) {
+					argList.add(element(name("argument"), "--exclude-labels"));
+					argList.add(element(name("argument"), graph.excludeLabels));
+				}
+				
+                // branch in case we have csv file
+				if(outputResultFile.endsWith(".csv")){
+					argList.add(element(name("argument"), "--generate-csv"));
+				} else {
+					argList.add(element(name("argument"), "--width"));
+					argList.add(element(name("argument"), String.valueOf(graph.width)));
+					argList.add(element(name("argument"), "--height"));
+					argList.add(element(name("argument"), String.valueOf(graph.height)));
+					if(!StringUtils.isBlank(graph.graphPerRow)){
+						argList.add(element(name("argument"), "--graph-per-row"));
+						argList.add(element(name("argument"), graph.graphPerRow));
+					}
+					if(graph.granulation != null){
+						argList.add(element(name("argument"), "--granulation"));
+						argList.add(element(name("argument"), String.valueOf(graph.granulation)));
+					}
+					if(!StringUtils.isBlank(graph.preventOutliers)){
+						argList.add(element(name("argument"), "--prevent-outliers"));
+						argList.add(element(name("argument"), graph.preventOutliers));
+					}
+					if(!StringUtils.isBlank(graph.lineWeight)){
+						argList.add(element(name("argument"), "--line-weight"));
+						argList.add(element(name("argument"), graph.lineWeight));
+					}
+					argList.add(element(name("argument"), "--generate-png"));
+				}
+				
+				argList.add(element(name("argument"), outputResultFile));
+				
+				try {
+        			executeMojo(
+                        plugin(
+                                groupId("org.codehaus.mojo"),
+                                artifactId("exec-maven-plugin"),
+                                version("1.2.1")),
+                        goal("exec"),
+                        configuration(
+                                element(name("executable"), "java"),
+                                element(name("workingDirectory"), binDir.getAbsolutePath()),
+                                element(name("arguments"),
+                                		argList.toArray(new Element[0]))),
+                        executionEnvironment(
+                                mavenProject,
+                                mavenSession,
+                                pluginManager));
+		        } catch (Throwable throwable) {
+		            throw new RuntimeException(throwable);
+		        }
 	        }
         }
     }
@@ -226,6 +258,9 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String pluginType;
         Integer width;
         Integer height;
+        String relativeTimes;
+        String includeLabels;
+        String excludeLabels;
         File outputFile;
         String outputFilePattern;
         String graphPerRow;
@@ -241,12 +276,20 @@ public class JMeterPluginsMojo extends AbstractMojo {
         	return new File(outputFilePattern.replace(FILENAME_REPLACE_PATTERN, FilenameUtils.removeExtension(inputFile.getName())));
         }
 
+        Graph() {
+            width = 800;
+            height = 600;
+        }
+
         @Override
         public String toString() {
             return "Graph{" +
                     "pluginType='" + pluginType + '\'' +
                     ", width=" + width +
                     ", height=" + height +
+                    ", relativeTimes=" + relativeTimes +
+                    ", includeLabels=" + includeLabels +
+                    ", excludeLabels=" + excludeLabels +
                     ", outputFile=" + outputFile +
                     ", outputFilePattern=" + outputFilePattern +
                     ", graphPerRow=" + graphPerRow +

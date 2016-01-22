@@ -37,6 +37,24 @@
     </developers>
 
     <contributors>
+        <contributor>
+             <name>jkirchberg</name>
+        </contributor>
+        <contributor>
+             <name>Boris Petrovic</name>
+        </contributor>
+        <contributor>
+             <name>Marcelo Gore</name>
+        </contributor>
+        <contributor>
+             <name>Paul Steinbach</name>
+        </contributor>
+        <contributor>
+             <name>Philip Taferner</name>
+        </contributor>
+        <contributor>
+             <name>Michael Zhilin</name>
+        </contributor>
     </contributors>
 
     <issueManagement>

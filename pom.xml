@@ -18,7 +18,6 @@
         to create nice graphs from jmeter result files.
     </description>
     <url>https://github.com/codecentric/jmeter-graph-maven-plugin</url>
-
     <licenses>
         <license>
             <name>MIT</name>
@@ -32,12 +31,33 @@
             <id>mlex</id>
             <name>Michael Lex</name>
             <roles>
-                <role>Comitter</role>
+                <role>Committer</role>
             </roles>
         </developer>
     </developers>
 
     <contributors>
+        <contributor>
+             <name>jkirchberg</name>
+        </contributor>
+        <contributor>
+             <name>Boris Petrovic</name>
+        </contributor>
+        <contributor>
+             <name>Marcelo Gore</name>
+        </contributor>
+        <contributor>
+             <name>Paul Steinbach</name>
+        </contributor>
+        <contributor>
+             <name>Philip Taferner</name>
+        </contributor>
+        <contributor>
+             <name>Michael Zhilin</name>
+        </contributor>
+        <contributor>
+             <name>srdkr</name>
+        </contributor>
     </contributors>
 
     <issueManagement>
@@ -75,8 +95,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jmeter.version>2.10</jmeter.version>
-        <jmeter.plugins.version>1.0.0</jmeter.plugins.version>
+        <jmeter.version>2.13</jmeter.version>
+        <jmeter.plugins.version>1.3.1</jmeter.plugins.version>
     </properties>
 
     <dependencies>
@@ -103,26 +123,35 @@
             <artifactId>mojo-executor</artifactId>
             <version>2.1.0</version>
         </dependency>
+        <dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-core</artifactId>
+		    <version>4.0.3.RELEASE</version>
+		</dependency>
 
-        <!-- JMeter dependencies -->
         <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_core</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_config</artifactId>
-            <version>${jmeter.version}</version>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-standard</artifactId>
+            <version>${jmeter.plugins.version}</version>
+            <exclusions>
+                <!-- Those are not available in mvncentral -->
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>kg.apc</groupId>
+                    <artifactId>perfmon</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>kg.apc</groupId>
-            <artifactId>jmeter-plugins</artifactId>
+            <artifactId>jmeter-plugins-extras</artifactId>
             <version>${jmeter.plugins.version}</version>
             <exclusions>
                 <!-- Those are not available in mvncentral -->
@@ -217,7 +246,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.2</version>
+                <version>2.4.2</version><!--$NO-MVN-MAN-VER$-->
             </plugin>
         </plugins>
     </build>

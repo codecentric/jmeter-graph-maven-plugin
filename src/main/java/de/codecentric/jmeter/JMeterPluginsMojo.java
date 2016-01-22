@@ -138,6 +138,8 @@ public class JMeterPluginsMojo extends AbstractMojo {
 				argList.add(element(name("argument"), source.getAbsolutePath()));
 				argList.add(element(name("argument"), "--plugin-type"));
 				argList.add(element(name("argument"), graph.pluginType));
+				argList.add(element(name("argument"), "--aggregate-rows"));
+				argList.add(element(name("argument"), graph.getAggregateRows()));
 				
 				if (graph.relativeTimes != null) {
 					argList.add(element(name("argument"), "--relative-times"));
@@ -151,7 +153,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
 					argList.add(element(name("argument"), "--exclude-labels"));
 					argList.add(element(name("argument"), graph.excludeLabels));
 				}
-				
+
                 // branch in case we have csv file
 				if(outputResultFile.endsWith(".csv")){
 					argList.add(element(name("argument"), "--generate-csv"));
@@ -266,6 +268,11 @@ public class JMeterPluginsMojo extends AbstractMojo {
         Integer granulation;
         String preventOutliers;
         String lineWeight;
+        Boolean aggregateRows;
+
+        String getAggregateRows() {
+            return aggregateRows != null && aggregateRows == true ? "yes" : "no";
+        }
         
         File getOutputFile(File inputFile) {
         	if (outputFile != null) {
@@ -275,7 +282,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
         	return new File(outputFilePattern.replace(FILENAME_REPLACE_PATTERN, FilenameUtils.removeExtension(inputFile.getName())));
         }
 
-        Graph() {
+        public Graph() {
             width = 800;
             height = 600;
         }
@@ -294,6 +301,7 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     ", graphPerRow=" + graphPerRow +
                     ", granulation=" + granulation + 
                     ", preventOutliers= " + preventOutliers +
+                    ", aggregateRows=" + getAggregateRows() +
                     '}';
         }
     }

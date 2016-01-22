@@ -8,9 +8,9 @@
         <version>7</version>
     </parent>
 
-    <groupId>de.codecentric</groupId>
+    <groupId>com.github.Cka3o4Huk.jmeter-graph-plugin</groupId>
     <artifactId>jmeter-graph-maven-plugin</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
     <packaging>maven-plugin</packaging>
     <name>JMeter Graphs Maven Plugin</name>
     <description>
@@ -34,6 +34,13 @@
                 <role>Committer</role>
             </roles>
         </developer>
+        <developer>
+            <id>Cka3o4Huk</id>
+            <name>Michael Zhilin</name>
+            <roles>
+                <role>Committer</role>
+            </roles>
+        </developer>
     </developers>
 
     <contributors>
@@ -51,9 +58,6 @@
         </contributor>
         <contributor>
              <name>Philip Taferner</name>
-        </contributor>
-        <contributor>
-             <name>Michael Zhilin</name>
         </contributor>
         <contributor>
              <name>srdkr</name>

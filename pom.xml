@@ -10,7 +10,7 @@
 
     <groupId>com.github.Cka3o4Huk</groupId>
     <artifactId>jmeter-graph-maven-plugin</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>JMeter Graphs Maven Plugin</name>
     <description>

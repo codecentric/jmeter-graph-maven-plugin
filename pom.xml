@@ -8,7 +8,7 @@
         <version>7</version>
     </parent>
 
-    <groupId>com.github.Cka3o4Huk.jmeter-graph-plugin</groupId>
+    <groupId>com.github.Cka3o4Huk</groupId>
     <artifactId>jmeter-graph-maven-plugin</artifactId>
     <version>0.1.1</version>
     <packaging>maven-plugin</packaging>
@@ -17,7 +17,7 @@
         A plugin to include the functionality of JMeterPluginsCMD Command Line Tool
         to create nice graphs from jmeter result files.
     </description>
-    <url>https://github.com/codecentric/jmeter-graph-maven-plugin</url>
+    <url>https://github.com/Cka3o4Huk/jmeter-graph-maven-plugin</url>
     <licenses>
         <license>
             <name>MIT</name>
@@ -66,23 +66,22 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/codecentric/jmeter-graph-maven-plugin/issues</url>
+        <url>https://github.com/Cka3o4Huk/jmeter-graph-maven-plugin/issues</url>
     </issueManagement>
 
-    <!--
+
     <ciManagement>
         <system>Travis-CI</system>
-        <url>http://travis-ci.com/codecentric/jmeter-graph-maven-plugin</url>
+        <url>http://travis-ci.com/Cka3o4Huk/jmeter-graph-maven-plugin</url>
     </ciManagement>
-    -->
 
     <mailingLists>
     </mailingLists>
 
     <scm>
-        <connection>scm:git:git@github.com:codecentric/jmeter-graph-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:codecentric/jmeter-graph-maven-plugin.git</developerConnection>
-        <url>https://github.com/codecentric/jmeter-graph-maven-plugin</url>
+        <connection>scm:git:git@github.com:Cka3o4Huk/jmeter-graph-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:Cka3o4Huk/jmeter-graph-maven-plugin.git</developerConnection>
+        <url>https://github.com/Cka3o4Huk/jmeter-graph-maven-plugin</url>
         <tag>HEAD</tag>
     </scm>
 

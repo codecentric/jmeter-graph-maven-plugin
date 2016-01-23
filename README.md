@@ -1,5 +1,5 @@
 [![Build Status](https://api.travis-ci.org/Cka3o4Huk/jmeter-graph-maven-plugin.svg?branch=master)](https://travis-ci.org/Cka3o4Huk/jmeter-graph-maven-plugin)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.Cka3o4Huk.jmeter-graph-plugin/jmeter-graph-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.Cka3o4Huk.jmeter-graph-plugin/jmeter-graph-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.Cka3o4Huk/jmeter-graph-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.Cka3o4Huk/jmeter-graph-maven-plugin)
 
 jmeter-graph-maven-plugin
 =========================

@@ -2,12 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>oss-parent</artifactId>
-        <groupId>org.sonatype.oss</groupId>
-        <version>7</version>
-    </parent>
-
     <groupId>com.github.Cka3o4Huk</groupId>
     <artifactId>jmeter-graph-maven-plugin</artifactId>
     <version>0.1.2-SNAPSHOT</version>
@@ -72,7 +66,7 @@
 
     <ciManagement>
         <system>Travis-CI</system>
-        <url>http://travis-ci.com/Cka3o4Huk/jmeter-graph-maven-plugin</url>
+        <url>http://travis-ci.org/Cka3o4Huk/jmeter-graph-maven-plugin</url>
     </ciManagement>
 
     <mailingLists>

@@ -1,3 +1,6 @@
+[![Build Status](https://api.travis-ci.org/Cka3o4Huk/jmeter-graph-maven-plugin.svg?branch=master)](https://travis-ci.org/Cka3o4Huk/jmeter-graph-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.Cka3o4Huk/jmeter-graph-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.Cka3o4Huk/jmeter-graph-maven-plugin)
+
 jmeter-graph-maven-plugin
 =========================
 
@@ -18,9 +21,9 @@ Just include the plugin in your `pom.xml` and execute `mvn jmeter-graph:create-g
   <build>
     <plugins>
       <plugin>
-        <groupId>de.codecentric</groupId>
+        <groupId>com.github.Cka3o4Huk.jmeter-graph-plugin</groupId>
         <artifactId>jmeter-graph-maven-plugin</artifactId>
-        <version>0.1.0</version>
+        <version>0.1.1</version>
         <configuration>
           <inputFile>${project.build.directory}/jmeter/results/SimpleWebservicePerformanceTest.jtl</inputFile>
           <graphs>

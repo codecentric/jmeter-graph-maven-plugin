@@ -1,6 +1,8 @@
 package de.codecentric.jmeter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -12,9 +14,13 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -25,6 +31,7 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 @Mojo(name = "create-graph")
 public class JMeterPluginsMojo extends AbstractMojo {
 
+	public static final String FILENAME_REPLACE_PATTERN = "%FILENAME%";
     public static final String JMETER_CONFIG_ARTIFACT_NAME = "ApacheJMeter_config";
     public static final String JMETER_PLUGINS_ARTIFACT_NAME = "jmeter-plugins";
     public static final String JMETER_ARTIFACT_NAME = "ApacheJMeter";
@@ -32,6 +39,9 @@ public class JMeterPluginsMojo extends AbstractMojo {
 
     @Parameter
     File inputFile;
+
+    @Parameter
+    String inputFilePattern;
 
     @Parameter
     List<Graph> graphs;
@@ -50,9 +60,16 @@ public class JMeterPluginsMojo extends AbstractMojo {
 
     @Component
     PluginDescriptor plugin;
+    
+    @Parameter(defaultValue = "false")
+    boolean skip;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if(skip){
+            return;
+        }
+        
         if (graphs == null) {
             getLog().error("No graphs defined.");
         }
@@ -101,10 +118,121 @@ public class JMeterPluginsMojo extends AbstractMojo {
             }
         }
 
-        for (Graph graph : graphs) {
-            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
-            try {
-                executeMojo(
+        for (File source : getInputFiles()) {
+        	getLog().info("Processing " + source);
+
+	        for (Graph graph : graphs) {
+	            getLog().debug("Creating graph: " + graphs != null ? graphs.toString() : "<null>");
+	            String outputResultFile = graph.getOutputFile(source).getAbsolutePath();
+	            
+	            ArrayList<Element> argList = new ArrayList<Element>();
+				argList.add(element(name("argument"), "-classpath"));
+				argList.add(element(name("argument"),
+						libDir.getAbsolutePath() + File.separator + "*" +
+								File.pathSeparator +
+								libExtDir.getAbsolutePath() + File.separator + "*"));
+				argList.add(element(name("argument"), "kg.apc.cmd.UniversalRunner"));
+				argList.add(element(name("argument"), "--tool"));
+				argList.add(element(name("argument"), "Reporter"));
+				argList.add(element(name("argument"), "--input-jtl"));
+				argList.add(element(name("argument"), source.getAbsolutePath()));
+				argList.add(element(name("argument"), "--plugin-type"));
+				argList.add(element(name("argument"), graph.pluginType));
+				argList.add(element(name("argument"), "--aggregate-rows"));
+				argList.add(element(name("argument"), graph.getAggregateRows()));
+				
+				if (graph.relativeTimes != null) {
+					argList.add(element(name("argument"), "--relative-times"));
+					argList.add(element(name("argument"), "no".equalsIgnoreCase(graph.relativeTimes)? "no" : "yes"));
+				}
+				if (graph.includeLabels != null) {
+					argList.add(element(name("argument"), "--include-labels"));
+					argList.add(element(name("argument"), graph.includeLabels));
+				}
+				if (graph.excludeLabels != null) {
+					argList.add(element(name("argument"), "--exclude-labels"));
+					argList.add(element(name("argument"), graph.excludeLabels));
+				}
+
+                // branch in case we have csv file
+				if(outputResultFile.endsWith(".csv")){
+					argList.add(element(name("argument"), "--generate-csv"));
+				} else {
+					argList.add(element(name("argument"), "--width"));
+					argList.add(element(name("argument"), String.valueOf(graph.width)));
+					argList.add(element(name("argument"), "--height"));
+					argList.add(element(name("argument"), String.valueOf(graph.height)));
+					if(!StringUtils.isBlank(graph.graphPerRow)){
+						argList.add(element(name("argument"), "--graph-per-row"));
+						argList.add(element(name("argument"), graph.graphPerRow));
+					}
+					if(graph.granulation != null){
+						argList.add(element(name("argument"), "--granulation"));
+						argList.add(element(name("argument"), String.valueOf(graph.granulation)));
+					}
+					if(!StringUtils.isBlank(graph.preventOutliers)){
+						argList.add(element(name("argument"), "--prevent-outliers"));
+						argList.add(element(name("argument"), graph.preventOutliers));
+					}
+					if(!StringUtils.isBlank(graph.lineWeight)){
+						argList.add(element(name("argument"), "--line-weight"));
+						argList.add(element(name("argument"), graph.lineWeight));
+					}
+					if (graph.getPaintGradient() != null) {
+                        argList.add(element(name("argument"), "--paint-gradient"));
+                        argList.add(element(name("argument"), graph.getPaintGradient()));
+                    }
+                    if (graph.getPaintZeroing() != null) {
+                        argList.add(element(name("argument"), "--paint-zeroing"));
+                        argList.add(element(name("argument"), graph.getPaintZeroing()));
+                    }
+                    if (graph.getPaintMarkers() != null) {
+                        argList.add(element(name("argument"), "--paint-markers"));
+                        argList.add(element(name("argument"), graph.getPaintMarkers()));
+                    }
+                    if (graph.forceY != null) {
+                        argList.add(element(name("argument"), "--force-y"));
+                        argList.add(element(name("argument"), String.valueOf(graph.forceY)));
+                    }
+                    if (graph.hideLowCounts != null) {
+                        argList.add(element(name("argument"), "--hide-low-counts"));
+                        argList.add(element(name("argument"), String.valueOf(graph.hideLowCounts)));
+                    }
+                    if (graph.getSuccessFilter() != null) {
+                        argList.add(element(name("argument"), "--success-filter"));
+                        argList.add(element(name("argument"), graph.getSuccessFilter()));
+                    }
+                    if (graph.getAutoScale() != null) {
+                        argList.add(element(name("argument"), "--auto-scale"));
+                        argList.add(element(name("argument"), graph.getAutoScale()));
+                    }
+                    if(!StringUtils.isBlank(graph.extractorRegexps)){
+                        argList.add(element(name("argument"), "--extractor-regexps"));
+                        argList.add(element(name("argument"), graph.extractorRegexps));
+                    }
+                    if (graph.getIncludeLabelRegex() != null) {
+                        argList.add(element(name("argument"), "--include-label-regex"));
+                        argList.add(element(name("argument"), graph.getIncludeLabelRegex()));
+                    }
+                    if (graph.getExcludeLabelRegex() != null) {
+                        argList.add(element(name("argument"), "--exclude-label-regex"));
+                        argList.add(element(name("argument"), graph.getExcludeLabelRegex()));
+                    }
+                    if (graph.startOffset != null) {
+                        argList.add(element(name("argument"), "--start-offset"));
+                        argList.add(element(name("argument"), String.valueOf(graph.startOffset)));
+                    }
+                    if (graph.endOffset != null) {
+                        argList.add(element(name("argument"), "--end-offset"));
+                        argList.add(element(name("argument"), String.valueOf(graph.endOffset)));
+                    }
+					argList.add(element(name("argument"), "--generate-png"));
+				}
+				
+				argList.add(element(name("argument"), outputResultFile));
+				
+				try {
+        			executeMojo(
                         plugin(
                                 groupId("org.codehaus.mojo"),
                                 artifactId("exec-maven-plugin"),
@@ -114,34 +242,39 @@ public class JMeterPluginsMojo extends AbstractMojo {
                                 element(name("executable"), "java"),
                                 element(name("workingDirectory"), binDir.getAbsolutePath()),
                                 element(name("arguments"),
-                                        element(name("argument"), "-Dlog_file="),
-                                        element(name("argument"), "-classpath"),
-                                        element(name("argument"),
-                                                libDir.getAbsolutePath() + File.separator + "*" +
-                                                File.pathSeparator +
-                                                libExtDir.getAbsolutePath() + File.separator + "*"),
-                                        element(name("argument"), "kg.apc.cmd.UniversalRunner"),
-                                        element(name("argument"), "--tool"),
-                                        element(name("argument"), "Reporter"),
-                                        element(name("argument"), "--input-jtl"),
-                                        element(name("argument"), inputFile.getAbsolutePath()),
-                                        element(name("argument"), "--plugin-type"),
-                                        element(name("argument"), graph.pluginType),
-                                        element(name("argument"), "--width"),
-                                        element(name("argument"), String.valueOf(graph.width)),
-                                        element(name("argument"), "--height"),
-                                        element(name("argument"), String.valueOf(graph.height)),
-                                        element(name("argument"), "--generate-png"),
-                                        element(name("argument"), graph.outputFile.getAbsolutePath()))),
+                                		argList.toArray(new Element[0]))),
                         executionEnvironment(
                                 mavenProject,
                                 mavenSession,
                                 pluginManager));
-            } catch (Throwable throwable) {
-                throw new RuntimeException(throwable);
-            }
+		        } catch (Throwable throwable) {
+		            throw new RuntimeException(throwable);
+		        }
+	        }
         }
     }
+
+	private Collection<File> getInputFiles() {
+		final Collection<File> dataInputFiles = new ArrayList<File>();
+
+        if (inputFile != null) {
+        	dataInputFiles.add(inputFile);
+        }
+
+        if (StringUtils.isNotEmpty(inputFilePattern)) {
+            final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            try {
+				for (Resource resource : resolver.getResources("file:" + inputFilePattern)) {
+					getLog().info("Adding " + resource.getFile());
+					dataInputFiles.add(resource.getFile());
+				}
+			} catch (IOException e) {
+				getLog().warn("Unable to add input files: " + e.getMessage());
+			}
+        }
+
+		return dataInputFiles;
+	}
 
     private boolean isJMeterPluginsDependency(Artifact artifact) {
         return isDependencyOf(artifact, JMETER_PLUGINS_ARTIFACT_NAME);
@@ -174,7 +307,62 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String pluginType;
         Integer width;
         Integer height;
+        String relativeTimes;
+        String includeLabels;
+        String excludeLabels;
         File outputFile;
+        String outputFilePattern;
+        String graphPerRow;
+        Integer granulation;
+        String preventOutliers;
+        String lineWeight;
+        Boolean aggregateRows;
+        Boolean paintGradient;
+        Boolean paintZeroing;
+        Boolean paintMarkers;
+        Integer forceY;
+        Integer hideLowCounts;
+        Boolean successFilter;
+        Boolean autoScale;
+        String extractorRegexps;
+        Boolean includeLabelRegex;
+        Boolean excludeLabelRegex;
+        Long startOffset;
+        Long endOffset;
+
+
+        String getAggregateRows() {
+            return aggregateRows != null && aggregateRows == true ? "yes" : "no";
+        }
+        String getPaintGradient() { return getBooleanValueAsString(paintGradient, "yes", "no"); }
+        String getPaintZeroing() { return getBooleanValueAsString(paintZeroing, "yes", "no"); }
+        String getPaintMarkers() { return getBooleanValueAsString(paintMarkers, "yes", "no"); }
+        String getSuccessFilter() { return getBooleanValueAsString(successFilter, "true", "false"); }
+        String getAutoScale() { return getBooleanValueAsString(autoScale, "yes", "no"); }
+        String getIncludeLabelRegex() { return getBooleanValueAsString(includeLabelRegex, "true", "false"); }
+        String getExcludeLabelRegex() { return getBooleanValueAsString(excludeLabelRegex, "true", "false"); }
+
+        private static String getBooleanValueAsString(Boolean value, String stringTrueValue, String stringFalseValue) {
+            if (value == null) {
+                return null;
+            }
+
+            return value == true ? stringTrueValue : stringFalseValue;
+        }
+
+        
+        File getOutputFile(File inputFile) {
+        	if (outputFile != null) {
+        		return outputFile;
+        	}
+
+        	return new File(outputFilePattern.replace(FILENAME_REPLACE_PATTERN, FilenameUtils.removeExtension(inputFile.getName())));
+        }
+
+        public Graph() {
+            width = 800;
+            height = 600;
+        }
 
         @Override
         public String toString() {
@@ -182,8 +370,72 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     "pluginType='" + pluginType + '\'' +
                     ", width=" + width +
                     ", height=" + height +
+                    ", relativeTimes=" + relativeTimes +
+                    ", includeLabels=" + includeLabels +
+                    ", excludeLabels=" + excludeLabels +
                     ", outputFile=" + outputFile +
+                    ", outputFilePattern=" + outputFilePattern +
+                    ", graphPerRow=" + graphPerRow +
+                    ", granulation=" + granulation + 
+                    ", preventOutliers= " + preventOutliers +
+                    ", aggregateRows=" + getAggregateRows() +
+                    ", paintGradient=" + getPaintGradient() +
+                    ", paintZeroing=" + getPaintZeroing() +
+                    ", paintMarkers=" + getPaintMarkers() +
+                    ", forceY=" + forceY +
+                    ", hideLowCounts=" + hideLowCounts +
+                    ", sucessFilter=" + getSuccessFilter() +
+                    ", autoScale=" + getAutoScale() +
+                    ", extractorRegexps=" + extractorRegexps +
+                    ", includeLabelRegex=" + getIncludeLabelRegex() +
+                    ", excludeLabelRegex=" + getExcludeLabelRegex() +
+                    ", startOffset=" + startOffset +
+                    ", endOffset=" + endOffset +
                     '}';
         }
+    }
+    
+    //public  static class  ArrayHelper<T> {
+    /**
+     * A little unwind arrays to varargs utility
+     * @param elems
+     * @return
+     */
+    public static   Element[] array(Object... elems)
+    {
+	 	List<Element> list = new ArrayList<Element>();
+	 	for (Object el : elems) {
+	 		if (el instanceof Element) {
+	 			list.add((Element)el);
+	 		} else 
+	 			if ( el instanceof Element[])  {
+	 				for (Element el1: ((Element[])el)) {
+	 					list.add(el1);
+	 				}
+	 			}
+	 	}
+        return list.toArray(new Element[list.size()]);
+    }
+    
+    public static Element[] argument(String argName){
+        return argument(argName, "");
+    }
+    
+    public static Element[] argument(String argName, String argValue){
+        return argument(argName, argValue, true);
+    }
+    
+    public static Element[] argument(String argName, String argValue, boolean condition){
+        if(!condition) {
+            return new Element[0];
+        }
+        
+        Element first = element(name("argument"), argName);
+        
+        if(StringUtils.isBlank(argValue)){
+            return array(first);
+        }
+        
+        return array(first, element(name("argument"), argValue));
     }
 }

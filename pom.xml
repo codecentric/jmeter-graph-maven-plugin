@@ -2,23 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>oss-parent</artifactId>
-        <groupId>org.sonatype.oss</groupId>
-        <version>7</version>
-    </parent>
-
-    <groupId>de.codecentric</groupId>
+    <groupId>com.github.Cka3o4Huk</groupId>
     <artifactId>jmeter-graph-maven-plugin</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>JMeter Graphs Maven Plugin</name>
     <description>
         A plugin to include the functionality of JMeterPluginsCMD Command Line Tool
         to create nice graphs from jmeter result files.
     </description>
-    <url>https://github.com/codecentric/jmeter-graph-maven-plugin</url>
-
+    <url>https://github.com/Cka3o4Huk/jmeter-graph-maven-plugin</url>
     <licenses>
         <license>
             <name>MIT</name>
@@ -32,33 +25,57 @@
             <id>mlex</id>
             <name>Michael Lex</name>
             <roles>
-                <role>Comitter</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>Cka3o4Huk</id>
+            <name>Michael Zhilin</name>
+            <roles>
+                <role>Committer</role>
             </roles>
         </developer>
     </developers>
 
     <contributors>
+        <contributor>
+             <name>jkirchberg</name>
+        </contributor>
+        <contributor>
+             <name>Boris Petrovic</name>
+        </contributor>
+        <contributor>
+             <name>Marcelo Gore</name>
+        </contributor>
+        <contributor>
+             <name>Paul Steinbach</name>
+        </contributor>
+        <contributor>
+             <name>Philip Taferner</name>
+        </contributor>
+        <contributor>
+             <name>srdkr</name>
+        </contributor>
     </contributors>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/codecentric/jmeter-graph-maven-plugin/issues</url>
+        <url>https://github.com/Cka3o4Huk/jmeter-graph-maven-plugin/issues</url>
     </issueManagement>
 
-    <!--
+
     <ciManagement>
         <system>Travis-CI</system>
-        <url>http://travis-ci.com/codecentric/jmeter-graph-maven-plugin</url>
+        <url>http://travis-ci.org/Cka3o4Huk/jmeter-graph-maven-plugin</url>
     </ciManagement>
-    -->
 
     <mailingLists>
     </mailingLists>
 
     <scm>
-        <connection>scm:git:git@github.com:codecentric/jmeter-graph-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:codecentric/jmeter-graph-maven-plugin.git</developerConnection>
-        <url>https://github.com/codecentric/jmeter-graph-maven-plugin</url>
+        <connection>scm:git:git@github.com:Cka3o4Huk/jmeter-graph-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:Cka3o4Huk/jmeter-graph-maven-plugin.git</developerConnection>
+        <url>https://github.com/Cka3o4Huk/jmeter-graph-maven-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -75,8 +92,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jmeter.version>2.10</jmeter.version>
-        <jmeter.plugins.version>1.0.0</jmeter.plugins.version>
+        <jmeter.version>2.13</jmeter.version>
+        <jmeter.plugins.version>1.3.1</jmeter.plugins.version>
     </properties>
 
     <dependencies>
@@ -103,26 +120,35 @@
             <artifactId>mojo-executor</artifactId>
             <version>2.1.0</version>
         </dependency>
+        <dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-core</artifactId>
+		    <version>4.0.3.RELEASE</version>
+		</dependency>
 
-        <!-- JMeter dependencies -->
         <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_core</artifactId>
-            <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_config</artifactId>
-            <version>${jmeter.version}</version>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-standard</artifactId>
+            <version>${jmeter.plugins.version}</version>
+            <exclusions>
+                <!-- Those are not available in mvncentral -->
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>kg.apc</groupId>
+                    <artifactId>perfmon</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>kg.apc</groupId>
-            <artifactId>jmeter-plugins</artifactId>
+            <artifactId>jmeter-plugins-extras</artifactId>
             <version>${jmeter.plugins.version}</version>
             <exclusions>
                 <!-- Those are not available in mvncentral -->
@@ -141,6 +167,30 @@
             </exclusions>
         </dependency>
     </dependencies>
+    
+    <profiles>
+      <profile>
+        <id>release</id>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-gpg-plugin</artifactId>
+              <version>1.6</version>
+              <executions>
+                <execution>
+                  <id>sign-artifacts</id>
+                  <phase>verify</phase>
+                  <goals>
+                    <goal>sign</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </build>
+      </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -181,20 +231,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.2</version>
                 <executions>
@@ -217,7 +253,19 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.2</version>
+                <version>2.5.1</version><!--$NO-MVN-MAN-VER$-->
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <releaseProfiles>release-artifacts,release</releaseProfiles>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.9.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

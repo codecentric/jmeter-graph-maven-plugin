@@ -178,6 +178,54 @@ public class JMeterPluginsMojo extends AbstractMojo {
 						argList.add(element(name("argument"), "--line-weight"));
 						argList.add(element(name("argument"), graph.lineWeight));
 					}
+					if (graph.getPaintGradient() != null) {
+                        argList.add(element(name("argument"), "--paint-gradient"));
+                        argList.add(element(name("argument"), graph.getPaintGradient()));
+                    }
+                    if (graph.getPaintZeroing() != null) {
+                        argList.add(element(name("argument"), "--paint-zeroing"));
+                        argList.add(element(name("argument"), graph.getPaintZeroing()));
+                    }
+                    if (graph.getPaintMarkers() != null) {
+                        argList.add(element(name("argument"), "--paint-markers"));
+                        argList.add(element(name("argument"), graph.getPaintMarkers()));
+                    }
+                    if (graph.forceY != null) {
+                        argList.add(element(name("argument"), "--force-y"));
+                        argList.add(element(name("argument"), String.valueOf(graph.forceY)));
+                    }
+                    if (graph.hideLowCounts != null) {
+                        argList.add(element(name("argument"), "--hide-low-counts"));
+                        argList.add(element(name("argument"), String.valueOf(graph.hideLowCounts)));
+                    }
+                    if (graph.getSuccessFilter() != null) {
+                        argList.add(element(name("argument"), "--success-filter"));
+                        argList.add(element(name("argument"), graph.getSuccessFilter()));
+                    }
+                    if (graph.getAutoScale() != null) {
+                        argList.add(element(name("argument"), "--auto-scale"));
+                        argList.add(element(name("argument"), graph.getAutoScale()));
+                    }
+                    if(!StringUtils.isBlank(graph.extractorRegexps)){
+                        argList.add(element(name("argument"), "--extractor-regexps"));
+                        argList.add(element(name("argument"), graph.extractorRegexps));
+                    }
+                    if (graph.getIncludeLabelRegex() != null) {
+                        argList.add(element(name("argument"), "--include-label-regex"));
+                        argList.add(element(name("argument"), graph.getIncludeLabelRegex()));
+                    }
+                    if (graph.getExcludeLabelRegex() != null) {
+                        argList.add(element(name("argument"), "--exclude-label-regex"));
+                        argList.add(element(name("argument"), graph.getExcludeLabelRegex()));
+                    }
+                    if (graph.startOffset != null) {
+                        argList.add(element(name("argument"), "--start-offset"));
+                        argList.add(element(name("argument"), String.valueOf(graph.startOffset)));
+                    }
+                    if (graph.endOffset != null) {
+                        argList.add(element(name("argument"), "--end-offset"));
+                        argList.add(element(name("argument"), String.valueOf(graph.endOffset)));
+                    }
 					argList.add(element(name("argument"), "--generate-png"));
 				}
 				
@@ -269,10 +317,39 @@ public class JMeterPluginsMojo extends AbstractMojo {
         String preventOutliers;
         String lineWeight;
         Boolean aggregateRows;
+        Boolean paintGradient;
+        Boolean paintZeroing;
+        Boolean paintMarkers;
+        Integer forceY;
+        Integer hideLowCounts;
+        Boolean successFilter;
+        Boolean autoScale;
+        String extractorRegexps;
+        Boolean includeLabelRegex;
+        Boolean excludeLabelRegex;
+        Long startOffset;
+        Long endOffset;
+
 
         String getAggregateRows() {
             return aggregateRows != null && aggregateRows == true ? "yes" : "no";
         }
+        String getPaintGradient() { return getBooleanValueAsString(paintGradient, "yes", "no"); }
+        String getPaintZeroing() { return getBooleanValueAsString(paintZeroing, "yes", "no"); }
+        String getPaintMarkers() { return getBooleanValueAsString(paintMarkers, "yes", "no"); }
+        String getSuccessFilter() { return getBooleanValueAsString(successFilter, "true", "false"); }
+        String getAutoScale() { return getBooleanValueAsString(autoScale, "yes", "no"); }
+        String getIncludeLabelRegex() { return getBooleanValueAsString(includeLabelRegex, "true", "false"); }
+        String getExcludeLabelRegex() { return getBooleanValueAsString(excludeLabelRegex, "true", "false"); }
+
+        private static String getBooleanValueAsString(Boolean value, String stringTrueValue, String stringFalseValue) {
+            if (value == null) {
+                return null;
+            }
+
+            return value == true ? stringTrueValue : stringFalseValue;
+        }
+
         
         File getOutputFile(File inputFile) {
         	if (outputFile != null) {
@@ -302,6 +379,18 @@ public class JMeterPluginsMojo extends AbstractMojo {
                     ", granulation=" + granulation + 
                     ", preventOutliers= " + preventOutliers +
                     ", aggregateRows=" + getAggregateRows() +
+                    ", paintGradient=" + getPaintGradient() +
+                    ", paintZeroing=" + getPaintZeroing() +
+                    ", paintMarkers=" + getPaintMarkers() +
+                    ", forceY=" + forceY +
+                    ", hideLowCounts=" + hideLowCounts +
+                    ", sucessFilter=" + getSuccessFilter() +
+                    ", autoScale=" + getAutoScale() +
+                    ", extractorRegexps=" + extractorRegexps +
+                    ", includeLabelRegex=" + getIncludeLabelRegex() +
+                    ", excludeLabelRegex=" + getExcludeLabelRegex() +
+                    ", startOffset=" + startOffset +
+                    ", endOffset=" + endOffset +
                     '}';
         }
     }

@@ -202,17 +202,13 @@ You can also bind the graph-generation to a maven-phase, e.g. `verify`:
               <!-- ... you can declare filterResultsTool here -->
              <graphs>
                 <graph>
-									<inputFile>${project.build.directory}/jmeter/results/gestdoc_sc01_menu_local_monit.csv</inputFile>
-									<pluginType>ResponseCodesPerSecond</pluginType>
-									<width>800</width>
-									<height>600</height>
-									<generatePng>${project.build.directory}/jmeter/results/ResponseCodesPerSecond.png</generatePng>
-									<relativeTimes>no</relativeTimes>
-									<aggregateRows>no</aggregateRows>
-									<paintGradient>no</paintGradient>
-								</graph>
+                    <pluginType>ResponseTimesOverTime</pluginType>
+                    <inputFile>${project.build.directory}/jmeter/results/gestdoc_sc01_menu_local_monit.csv</inputFile>
+                    <generatePng>${project.build.directory}/jmeter/results/ResponseTimesOverTime.png</generatePng>
+                    <width>800</width>
+                    <height>600</height>
+                </graph>
                 <!-- ... you can declare more <graph>-elements here -->
-               
               </graphs>
             </configuration>
           </execution>

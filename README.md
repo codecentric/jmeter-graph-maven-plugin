@@ -169,7 +169,7 @@ Just include the plugin in your `pom.xml` and execute `mvn jmeter-graph:create-g
                         <xmx>${jvm_xmx}</xmx>
                     </jMeterProcessJVMSettings>
                     <!-- merge this properties with user.properties file in JMETER_HOME/bin -->
-                    <!-- property format = <property_name>property_value</property name> will be property_name=property_value in th user.properties file.
+                    <!-- property format = <property_name>property_value</property name> will be property_name=property_value in th user.properties file. -->
                     <propertiesUser>
                         <language>en</language>
                     </propertiesUser>
